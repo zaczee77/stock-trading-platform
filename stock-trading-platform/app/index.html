@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Trading Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+        #stock-bar {
+            height: 50px;
+            background: #333;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #recommendations {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="stock-bar">Loading stocks...</div>
+        <div id="recommendations">Recommendations will appear here...</div>
+    </div>
+
+    <script>
+        const stockBar = document.getElementById('stock-bar');
+        const recommendations = document.getElementById('recommendations');
+
+        // Function to fetch and update stock data
+        function fetchStockData() {
+            fetch('http://localhost:8000/stocks/')
+                .then(response => response.json())
+                .then(data => {
+                    const stocks = Object.entries(data).map(([symbol, price]) => `${symbol}: $${price}`).join(' | ');
+                    stockBar.textContent = stocks || 'No stocks available';
+                })
+                .catch(error => {
+                    stockBar.textContent = 'Error fetching stock data';
+                    console.error('Error:', error);
+                });
+        }
+
+        // Function to fetch recommendations
+        function fetchRecommendations() {
+            fetch('http://localhost:8000/recommendations/')
+                .then(response => response.json())
+                .then(data => {
+                    recommendations.textContent = data.message || 'No recommendations available';
+                })
+                .catch(error => {
+                    recommendations.textContent = 'Error fetching recommendations';
+                    console.error('Error:', error);
+                });
+        }
+
+        // Fetch data every 10 seconds
+        setInterval(() => {
+            fetchStockData();
+            fetchRecommendations();
+        }, 10000);
+
+        // Initial data fetch
+        fetchStockData();
+        fetchRecommendations();
+    </script>
+</body>
+</html>
